@@ -1,20 +1,8 @@
+#include "tokenizer.h"
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
-#include <optional>
 #include <sstream>
-#include "tokenizer.h"
-
-enum class TokenType { exit, int_lit, semi_colon };
-
-struct Token {
-  TokenType type;
-  std::optional<std::string> value;
-  Token(TokenType type, std::optional<std::string> value)
-      : type(type), value(value){};
-  Token(TokenType type) : Token(type, ""){};
-};
-
 
 int main(int argc, char *argv[]) {
   if (argc != 2) {
@@ -31,6 +19,9 @@ int main(int argc, char *argv[]) {
     file_stream << input_file.rdbuf();
     file_content = file_stream.str();
   }
+  //
+  Tokenizer tokenizer(file_content);
+  std::vector<Token> tokens = tokenizer.tokenize();
 
   return EXIT_SUCCESS;
 }
