@@ -5,12 +5,7 @@
 #include <optional>
 #include <string>
 #include <vector>
-
-enum Token{
-    _exit, 
-    _int_literal, 
-    _semicolon
-};
+#include "token.h"
 
 class Tokenizer {
 private:
