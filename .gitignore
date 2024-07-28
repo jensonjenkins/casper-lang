@@ -31,3 +31,4 @@
 *.out
 *.app
 csp
+csp_tests
