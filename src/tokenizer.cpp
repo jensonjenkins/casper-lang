@@ -1,64 +1,54 @@
 #include "tokenizer.h"
-#include <cctype>
-#include <cstdlib>
-#include <iostream>
+#include "tokentype.h"
 
 Tokenizer::Tokenizer(const std::string &src)
-    : m_src(std::move(src)), m_idx(0){};
+    : m_cursor(0), m_read_cursor(0), m_ch(0), m_src(src) {
+  readChar();
+};
 
-[[nodiscard]] std::optional<char> Tokenizer::peak(int ahead) const {
-  if (m_idx + ahead > m_src.size()) {
-    return {};
-  } else {
-    return m_src[m_idx];
+Token Tokenizer::nextToken() {
+  Token token;
+  std::string m_str = std::string(1, m_ch);
+
+  switch (m_ch) {
+  case '=':
+    token = Token(TokenType::_ASSIGN, m_str);
+    break;
+  case '+':
+    token = Token(TokenType::_PLUS, m_str);
+    break;
+  case ';':
+    token = Token(TokenType::_SEMICOLON, m_str);
+    break;
+  case '(':
+    token = Token(TokenType::_LPAREN, m_str);
+    break;
+  case ')':
+    token = Token(TokenType::_RPAREN, m_str);
+    break;
+  case '{':
+    token = Token(TokenType::_LBRACE, m_str);
+    break;
+  case '}':
+    token = Token(TokenType::_RBRACE, m_str);
+    break;
+  case ',':
+    token = Token(TokenType::_COMMA, m_str);
+    break;
+  case 0:
+    token = Token(TokenType::_EOF, "EOF");
+    break;
   }
+  readChar();
+  return token;
 }
 
-char Tokenizer::consume() { return m_src[m_idx++]; }
-
-std::vector<Token> Tokenizer::tokenize() {
-
-  std::vector<Token> tokens;
-  std::string buf;
-
-  while (peak().has_value()) {
-    if (std::isspace(peak().value())) {
-      consume();
-      continue;
-    }
-
-    if (std::isalpha(peak().value())) {
-      buf.push_back(consume());
-      while (peak().has_value() && std::isalnum(peak().value())) {
-        buf.push_back(consume());
-      }
-
-      if (buf == "exit") {
-        tokens.emplace_back(TokenType::_EXIT);
-      } else {
-        std::cerr << "Exit Error!" << std::endl;
-        exit(EXIT_FAILURE);
-      }
-      buf.clear();
-
-    } else if (std::isdigit(peak().value())) {
-      buf.push_back(consume());
-      while (peak().has_value() && std::isdigit(peak().value())) {
-        buf.push_back(consume());
-      }
-      tokens.emplace_back(TokenType::_INT_LITERAL, buf);
-      buf.clear();
-
-    } else if (peak().value() == ';') {
-      consume();
-      tokens.emplace_back(TokenType::_SEMICOLON);
-
-    } else {
-      std::cerr << "Unrecognized Error!" << std::endl;
-      exit(EXIT_FAILURE);
-    }
+void Tokenizer::readChar() {
+  if (m_read_cursor >= m_src.size()) {
+    m_ch = 0;
+  } else {
+    m_ch = m_src[m_read_cursor];
   }
-
-  m_idx = 0;
-  return tokens;
+  m_cursor = m_read_cursor;
+  m_read_cursor++;
 }

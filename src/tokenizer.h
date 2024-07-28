@@ -11,24 +11,28 @@ class Tokenizer {
 public:
   Tokenizer(const std::string &src);
 
+  /* Returns the next token to read. */
+  Token nextToken();
+
   /* Reads the source string, convert to a vector of tokens.
    */
   std::vector<Token> tokenize();
 
 private:
   /* Current cursor in the file. */
-  int m_idx;
+  int m_cursor;
+
+  /* Cursor that points to the next character in the input string. */
+  int m_read_cursor;
+
+  /* Current character pointed by the cursor. */
+  char m_ch;
 
   /* Incoming source code to compile in string. */
   const std::string m_src;
 
-  /* Checks the next incoming character if it exists. */
-  [[nodiscard]] std::optional<char> peak(int ahead = 1) const;
-
-  /* Returns the next character and 'consumes' that character,
-   * incrementing the index.
-   */
-  char consume();
+  /* To read the next character and consume it.*/
+  void readChar();
 };
 
 #endif
