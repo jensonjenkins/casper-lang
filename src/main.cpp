@@ -1,7 +1,9 @@
 #include "tokenizer.h"
+#include "tokentype.h"
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <ostream>
 #include <sstream>
 
 int main(int argc, char *argv[]) {
@@ -19,9 +21,6 @@ int main(int argc, char *argv[]) {
     file_stream << input_file.rdbuf();
     file_content = file_stream.str();
   }
-  //
-  Tokenizer tokenizer(file_content);
-  std::vector<Token> tokens = tokenizer.tokenize();
-
+  std::cout << TokenTypeToString(TokenType::_LPAREN) << std::endl;
   return EXIT_SUCCESS;
 }
