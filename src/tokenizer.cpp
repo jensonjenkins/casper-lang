@@ -45,53 +45,50 @@ TokenType Tokenizer::lookupIdentifier(std::string input) {
   }
 }
 
-void Tokenizer::skipWhitespace() {
+void Tokenizer::consumeWhitespace() {
   while (std::isspace(m_ch)) {
     readChar();
   }
 }
 
+void Tokenizer::consumeSingleToken(Token &token, const Token &token_object) {
+  token = token_object;
+  readChar();
+};
+
 Token Tokenizer::nextToken() {
   Token token;
-  skipWhitespace();
+  consumeWhitespace();
+
   std::string m_str = std::string(1, m_ch);
 
   switch (m_ch) {
   case '=':
-    token = Token(TokenType::_ASSIGN, m_str);
-    readChar(); 
+    consumeSingleToken(token, Token(TokenType::_ASSIGN, m_str));
     break;
   case '+':
-    token = Token(TokenType::_PLUS, m_str);
-    readChar(); 
+    consumeSingleToken(token, Token(TokenType::_PLUS, m_str));
     break;
   case ';':
-    token = Token(TokenType::_SEMICOLON, m_str);
-    readChar(); 
+    consumeSingleToken(token, Token(TokenType::_SEMICOLON, m_str));
     break;
   case '(':
-    token = Token(TokenType::_LPAREN, m_str);
-    readChar(); 
+    consumeSingleToken(token, Token(TokenType::_LPAREN, m_str));
     break;
   case ')':
-    token = Token(TokenType::_RPAREN, m_str);
-    readChar(); 
+    consumeSingleToken(token, Token(TokenType::_RPAREN, m_str));
     break;
   case '{':
-    token = Token(TokenType::_LBRACE, m_str);
-    readChar(); 
+    consumeSingleToken(token, Token(TokenType::_LBRACE, m_str));
     break;
   case '}':
-    token = Token(TokenType::_RBRACE, m_str);
-    readChar(); 
+    consumeSingleToken(token, Token(TokenType::_RBRACE, m_str));
     break;
   case ',':
-    token = Token(TokenType::_COMMA, m_str);
-    readChar(); 
+    consumeSingleToken(token, Token(TokenType::_COMMA, m_str));
     break;
   case 0:
-    token = Token(TokenType::_EOF, "");
-    readChar(); 
+    consumeSingleToken(token, Token(TokenType::_EOF, ""));
     break;
   default:
     if (std::isalpha(m_ch) || m_ch == '_') {

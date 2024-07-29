@@ -3,10 +3,10 @@
 #define TOKENIZER_H
 
 #include "token.h"
+#include <map>
 #include <optional>
 #include <string>
 #include <vector>
-#include <map>
 
 class Tokenizer {
 public:
@@ -43,7 +43,6 @@ private:
    */
   void readChar();
 
-
   /**
    * @brief Gets the std::string of the current token pointed by m_cursor
    * @return std::string of the current token
@@ -51,7 +50,8 @@ private:
   std::string readIdentifier();
 
   /**
-   * @brief Gets the std::string of the current token pointed by m_cursor (numeric)
+   * @brief Gets the std::string of the current token pointed by m_cursor
+   * (numeric)
    * @return std::string of the current token (digits only)
    */
   std::string readDigits();
@@ -70,7 +70,12 @@ private:
   /**
    * @brief Skips and consumes whitespace characters.
    */
-  void skipWhitespace();
+  void consumeWhitespace();
+
+  /**
+   * @brief Consumes tokens that are made of single characters.
+   */
+  void consumeSingleToken(Token &token, const Token &token_object);
 };
 
 #endif
