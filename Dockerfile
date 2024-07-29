@@ -7,3 +7,4 @@ COPY . /casper/dev/
 RUN apk update && apk add build-base
 
 CMD ["sh", "-c", "as --version && ld --version"]
+

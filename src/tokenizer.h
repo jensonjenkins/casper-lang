@@ -71,7 +71,7 @@ private:
    * @brief Skips and consumes whitespace characters.
    */
   void skipWhitespace();
-
 };
 
 #endif
+

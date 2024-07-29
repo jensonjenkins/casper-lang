@@ -21,6 +21,7 @@ int main(int argc, char *argv[]) {
     file_stream << input_file.rdbuf();
     file_content = file_stream.str();
   }
-  std::cout << TokenTypeToString(TokenType::_LPAREN) << std::endl;
+
   return EXIT_SUCCESS;
 }
+
