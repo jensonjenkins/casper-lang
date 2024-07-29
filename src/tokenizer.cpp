@@ -1,7 +1,6 @@
 #include "tokenizer.h"
 #include "tokentype.h"
 #include <cctype>
-#include <iostream>
 
 Tokenizer::Tokenizer(const std::string &src)
     : m_cursor(0), m_read_cursor(0), m_ch(0), m_src(src) {
@@ -16,6 +15,14 @@ void Tokenizer::readChar() {
   }
   m_cursor = m_read_cursor;
   m_read_cursor++;
+}
+
+char Tokenizer::peekChar() {
+  if (m_read_cursor >= m_src.size()) {
+    return 0;
+  } else {
+    return m_src[m_read_cursor];
+  }
 }
 
 std::string Tokenizer::readDigits() {
@@ -64,10 +71,40 @@ Token Tokenizer::nextToken() {
 
   switch (m_ch) {
   case '=':
-    consumeSingleToken(token, Token(TokenType::_ASSIGN, m_str));
+    if (peekChar() == '=') {
+      readChar();
+      std::string c_str = std::string(1, m_ch);
+      consumeSingleToken(token, Token(TokenType::_EQ, m_str + c_str));
+    } else {
+      consumeSingleToken(token, Token(TokenType::_ASSIGN, m_str));
+    }
     break;
   case '+':
     consumeSingleToken(token, Token(TokenType::_PLUS, m_str));
+    break;
+  case '-':
+    consumeSingleToken(token, Token(TokenType::_MINUS, m_str));
+    break;
+  case '!':
+    if (peekChar() == '=') {
+      readChar();
+      std::string c_str = std::string(1, m_ch);
+      consumeSingleToken(token, Token(TokenType::_NEQ, m_str + c_str));
+    } else {
+      consumeSingleToken(token, Token(TokenType::_BANG, m_str));
+    }
+    break;
+  case '*':
+    consumeSingleToken(token, Token(TokenType::_ASTERISK, m_str));
+    break;
+  case '/':
+    consumeSingleToken(token, Token(TokenType::_SLASH, m_str));
+    break;
+  case '<':
+    consumeSingleToken(token, Token(TokenType::_LT, m_str));
+    break;
+  case '>':
+    consumeSingleToken(token, Token(TokenType::_GT, m_str));
     break;
   case ';':
     consumeSingleToken(token, Token(TokenType::_SEMICOLON, m_str));
@@ -106,4 +143,3 @@ Token Tokenizer::nextToken() {
 
   return token;
 }
-

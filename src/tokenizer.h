@@ -33,15 +33,27 @@ private:
   const std::map<std::string, TokenType> keywords = {
       {"fn", TokenType::_FUNCTION},
       {"let", TokenType::_LET},
+      {"true", TokenType::_TRUE},
+      {"false", TokenType::_FALSE},
+      {"if", TokenType::_IF},
+      {"else", TokenType::_ELSE},
+      {"return", TokenType::_RETURN}
   };
 
   /* Incoming source code to compile in string. */
   const std::string m_src;
 
   /**
-   * @brief Reads the next character and consumes it.
+   * @brief Moves the cursor one char ahead
+   *
+   * Reads the next char and consumes it, shifting the cursor.
    */
   void readChar();
+
+  /**
+   * @brief returns the next character (cursor unchanged).
+   */
+  char peekChar();
 
   /**
    * @brief Gets the std::string of the current token pointed by m_cursor

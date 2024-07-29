@@ -14,6 +14,15 @@ enum TokenType{
     // Operators
     _ASSIGN,
     _PLUS,
+    _MINUS,
+    _BANG, 
+    _ASTERISK,
+    _SLASH,
+
+    _LT,
+    _GT,
+    _NEQ,
+    _EQ,
 
     // Delimiters
     _COMMA,
@@ -27,7 +36,11 @@ enum TokenType{
     // Keywords
     _FUNCTION,
     _LET,
-    _EXIT
+    _TRUE,
+    _FALSE,
+    _IF,
+    _ELSE,
+    _RETURN
 };
 
 const std::string TokenTypeToString(TokenType type);
