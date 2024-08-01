@@ -8,7 +8,7 @@ CXXFLAGS = -c
 OBJS = main.o 
 TEST_OBJS = unit_test.o tokenizer_test.o parser_test.o
 TOKEN_OBJS = token.o tokenizer.o tokentype.o 
-PARSER_OBJS = ast.o parser.o
+PARSER_OBJS = ast.o parser.o ast_base.o
 
 # Directory prefix
 SRC = ./src/
@@ -46,8 +46,11 @@ tokentype.o: $(SRC)tokentype.h $(SRC)tokentype.cpp
 
 
 # Parser Objects
-ast.o: $(SRC)token.h $(SRC)ast.h $(SRC)ast.cpp
+ast.o: $(SRC)token.h $(SRC)ast_base.h $(SRC)ast.cpp
 	$(CXX) $(CXXFLAGS) $(SRC)ast.cpp
+
+ast_base.o: $(SRC)token.h $(SRC)ast_base.h $(SRC)ast_base.cpp
+	$(CXX) $(CXXFLAGS) $(SRC)ast_base.cpp
 
 parser.o: $(SRC)parser.h $(SRC)ast.h $(SRC)tokenizer.h $(SRC)token.h $(SRC)parser.cpp
 	$(CXX) $(CXXFLAGS) $(SRC)parser.cpp

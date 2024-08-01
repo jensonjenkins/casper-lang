@@ -2,48 +2,50 @@
 #include "../src/parser.h"
 #include <cstdlib>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
 
-void validateLetStatement(Tokenizer &t, Statement *s,
+bool validateLetStatement(Tokenizer &t, std::shared_ptr<ast::Statement> s,
                           const std::string &expected_identifier,
                           const std::string &test_id) {
   if (s->TokenLiteral() != "let") {
-    std::cerr << test_id
-              << "TokenLiteral not 'let', instead got=" << s->TokenLiteral()
-              << std::endl;
-    exit(EXIT_FAILURE);
+    std::cerr << test_id << "TokenLiteral not 'let', instead got=\""
+              << s->TokenLiteral() << "\"" << std::endl;
+    return false;
   }
 
-  LetStatement *let_stmt = dynamic_cast<LetStatement *>(s);
+  std::shared_ptr<ast::LetStatement> let_stmt =
+      std::dynamic_pointer_cast<ast::LetStatement>(s);
 
   if (!let_stmt) {
     std::cerr << test_id << "*s is not a LetStatement" << std::endl;
-    exit(EXIT_FAILURE);
+    return false;
   }
 
   if (let_stmt->m_identifier_ptr->m_value != expected_identifier) {
     std::cerr << test_id << "let_stmt identifier value is not "
-              << expected_identifier
-              << ", instead got=" << let_stmt->m_identifier_ptr->m_value
-              << std::endl;
-    exit(EXIT_FAILURE);
+              << expected_identifier << ", instead got=\""
+              << let_stmt->m_identifier_ptr->m_value << "\"" << std::endl;
+    return false;
   }
 
   if (let_stmt->m_identifier_ptr->TokenLiteral() != expected_identifier) {
     std::cerr << test_id << "let_stmt identifier token literal is not "
-              << expected_identifier
-              << ", instead got=" << let_stmt->m_identifier_ptr->TokenLiteral()
+              << expected_identifier << ", instead got=\""
+              << let_stmt->m_identifier_ptr->TokenLiteral() << "\""
               << std::endl;
-    exit(EXIT_FAILURE);
+    return false;
   }
+
+  return true;
 }
 
 void TestLetStatements(std::string input,
                        const std::vector<std::string> expected, int tc) {
   Tokenizer t(input);
   Parser p(t);
-  Program *program = p.parseProgram();
+  ast::Program *program = p.parseProgram();
   std::string test_id = "let_statement_test[" + std::to_string(tc) + "] - ";
   if (program == nullptr) {
     std::cerr << test_id << "Program::parseProgram() returned nullptr"
@@ -53,15 +55,21 @@ void TestLetStatements(std::string input,
 
   if (program->m_statements.size() != expected.size()) {
     std::cerr << test_id << "Program::parseProgram() does not contain "
-              << expected.size()
-              << " statements. got=" << program->m_statements.size()
-              << std::endl;
+              << expected.size() << " statements. got=\""
+              << program->m_statements.size() << "\"" << std::endl;
     exit(EXIT_FAILURE);
   }
 
-  for (int i = 0; i < input.size(); i++) {
-    Statement *stmt = program->m_statements[i];
-    validateLetStatement(t, stmt, expected[i], test_id);
+  bool passed = true;
+  for (int i = 0; i < expected.size(); i++) {
+    std::shared_ptr<ast::Statement> stmt = program->m_statements[i];
+    if (!validateLetStatement(t, stmt, expected[i], test_id)) {
+      passed = false;
+    }
+  }
+
+  if (passed) {
+    std::cout << test_id << "passed." << std::endl;
   }
 }
 

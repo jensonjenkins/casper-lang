@@ -1,36 +1,23 @@
 #ifndef AST_H
 #define AST_H
 
-#include "token.h"
-#include <string>
-#include <vector>
+#include "ast_base.h"
+#include <memory>
 
-class Node {
-public:
-  virtual std::string TokenLiteral() const = 0;
-  virtual ~Node() = default;
-};
-
-class Statement : public Node {
-public:
-  virtual void statementNode() = 0;
-  virtual ~Statement() = default;
-};
-
-class Expression : public Node {
-public:
-  virtual void expressionNode() = 0;
-  virtual ~Expression() = default;
-};
+namespace ast {
 
 class Program : public Node {
 public:
+  Program();
+
   std::string TokenLiteral() const override;
-  std::vector<Statement *> m_statements;
+  std::vector<std::shared_ptr<Statement>> m_statements;
 };
 
 class Identifier : public Expression {
 public:
+  Identifier(const Token token, const std::string value);
+
   void expressionNode() override;
   std::string TokenLiteral() const override;
 
@@ -40,13 +27,18 @@ public:
 
 class LetStatement : public Statement {
 public:
+  LetStatement() = default;
+  LetStatement(const Token token, std::shared_ptr<Identifier> identifier_ptr,
+               Expression *value_ptr);
+
   void statementNode() override;
   std::string TokenLiteral() const override;
 
   Token m_token; // TokenType::_LET token
-  Identifier *m_identifier_ptr;
+  std::shared_ptr<Identifier> m_identifier_ptr;
   Expression *m_value_ptr;
 };
 
-#endif
+} // namespace ast
 
+#endif

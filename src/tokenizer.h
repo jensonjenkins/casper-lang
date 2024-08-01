@@ -12,7 +12,12 @@ class Tokenizer {
 public:
   Tokenizer(const std::string &src);
 
-  /* Returns the next token to read. */
+  /**
+   * @brief Returns a Token object of the current
+   *        character pointer by the cursor (m_ch)
+   * @return Token object of the character pointed
+   *         by current cursor when nextToken() was called
+   */
   Token nextToken();
 
   /* Reads the source string, convert to a vector of tokens.
@@ -31,14 +36,10 @@ private:
 
   /* std::map of existing keywords to its corresponding TokenType. */
   const std::map<std::string, TokenType> keywords = {
-      {"fn", TokenType::_FUNCTION},
-      {"let", TokenType::_LET},
-      {"true", TokenType::_TRUE},
-      {"false", TokenType::_FALSE},
-      {"if", TokenType::_IF},
-      {"else", TokenType::_ELSE},
-      {"return", TokenType::_RETURN}
-  };
+      {"fn", TokenType::_FUNCTION},  {"let", TokenType::_LET},
+      {"true", TokenType::_TRUE},    {"false", TokenType::_FALSE},
+      {"if", TokenType::_IF},        {"else", TokenType::_ELSE},
+      {"return", TokenType::_RETURN}};
 
   /* Incoming source code to compile in string. */
   const std::string m_src;
@@ -62,8 +63,8 @@ private:
   std::string readIdentifier();
 
   /**
-   * @brief Gets the std::string of the current token pointed by m_cursor
-   * (numeric)
+   * @brief Gets the std::string of the current token 
+   *        pointed by m_cursor (numeric)
    * @return std::string of the current token (digits only)
    */
   std::string readDigits();
@@ -91,4 +92,3 @@ private:
 };
 
 #endif
-
