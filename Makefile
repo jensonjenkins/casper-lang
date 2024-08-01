@@ -6,12 +6,13 @@ CXXFLAGS = -c
 
 # Object files
 OBJS = main.o 
-TEST_OBJS = tests.o 
+TEST_OBJS = unit_test.o tokenizer_test.o parser_test.o
 TOKEN_OBJS = token.o tokenizer.o tokentype.o 
+PARSER_OBJS = ast.o parser.o
 
 # Directory prefix
-PREF = ./src/
-TEST_PREF = ./tests/
+SRC = ./src/
+TESTS = ./tests/
 
 # Target executable
 TARGET = csp 
@@ -21,29 +22,49 @@ all: $(TARGET)
 
 test: $(TEST_TARGET)
 
-$(TARGET): $(OBJS)$(TOKEN_OBJS)
-	$(CXX) $(OBJS)$(TOKEN_OBJS) -o $(TARGET)
+$(TARGET): $(OBJS) $(TOKEN_OBJS) $(PARSER_OBJS)
+	$(CXX) $(OBJS) $(TOKEN_OBJS) $(PARSER_OBJS) -o $(TARGET)
 
-$(TEST_TARGET): $(TEST_OBJS) $(TOKEN_OBJS)
-	$(CXX) $(TEST_OBJS)$(TOKEN_OBJS) -o $(TEST_TARGET)
+$(TEST_TARGET): $(TEST_OBJS) $(TOKEN_OBJS) $(PARSER_OBJS)
+	$(CXX) $(TEST_OBJS) $(TOKEN_OBJS) $(PARSER_OBJS) -o $(TEST_TARGET)
 
-main.o: $(PREF)tokenizer.h $(PREF)main.cpp
-	$(CXX) $(CXXFLAGS) $(PREF)main.cpp
 
-tests.o: $(PREF)tokenizer.h $(TEST_PREF)tests.cpp
-	$(CXX) $(CXXFLAGS) $(TEST_PREF)tests.cpp
+# Module Objects
+main.o: $(SRC)tokenizer.h $(SRC)main.cpp
+	$(CXX) $(CXXFLAGS) $(SRC)main.cpp
 
-tokenizer.o: $(PREF)tokenizer.h $(PREF)tokenizer.cpp $(PREF)token.h
-	$(CXX) $(CXXFLAGS) $(PREF)tokenizer.cpp
 
-token.o: $(PREF)token.h $(PREF)token.cpp $(PREF)tokentype.h
-	$(CXX) $(CXXFLAGS) $(PREF)token.cpp
+# Token Objects
+tokenizer.o: $(SRC)tokenizer.h $(SRC)tokenizer.cpp $(SRC)token.h
+	$(CXX) $(CXXFLAGS) $(SRC)tokenizer.cpp
 
-tokentype.o: $(PREF)tokentype.h $(PREF)tokentype.cpp
-	$(CXX) $(CXXFLAGS) $(PREF)tokentype.cpp
+token.o: $(SRC)token.h $(SRC)token.cpp $(SRC)tokentype.h
+	$(CXX) $(CXXFLAGS) $(SRC)token.cpp
+
+tokentype.o: $(SRC)tokentype.h $(SRC)tokentype.cpp
+	$(CXX) $(CXXFLAGS) $(SRC)tokentype.cpp
+
+
+# Parser Objects
+ast.o: $(SRC)token.h $(SRC)ast.h $(SRC)ast.cpp
+	$(CXX) $(CXXFLAGS) $(SRC)ast.cpp
+
+parser.o: $(SRC)parser.h $(SRC)ast.h $(SRC)tokenizer.h $(SRC)token.h $(SRC)parser.cpp
+	$(CXX) $(CXXFLAGS) $(SRC)parser.cpp
+
+
+# Test Objects
+unit_test.o: $(TESTS)parser_test.h $(TESTS)tokenizer_test.h $(TESTS)unit_test.cpp
+	$(CXX) $(CXXFLAGS) $(TESTS)unit_test.cpp
+
+tokenizer_test.o: $(SRC)tokenizer.h $(TESTS)tokenizer_test.h $(TESTS)tokenizer_test.cpp
+	$(CXX) $(CXXFLAGS) $(TESTS)tokenizer_test.cpp
+
+parser_test.o: $(SRC)parser.h $(TESTS)parser_test.h $(TESTS)parser_test.cpp
+	$(CXX) $(CXXFLAGS) $(TESTS)parser_test.cpp
 
 
 .PHONY: clean
 clean:
-	rm -f $(TEST_OBJS) $(OBJS) $(TOKEN_OBJS) $(TEST_TARGET) $(TARGET)
+	rm -f $(OBJS) $(PARSER_OBJS) $(TOKEN_OBJS) $(TARGET) $(TEST_OBJS) $(TEST_TARGET)
 

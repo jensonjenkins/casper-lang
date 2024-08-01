@@ -1,4 +1,5 @@
 #include "../src/tokenizer.h"
+#include "tokenizer_test.h"
 #include <cstdlib>
 #include <iostream>
 #include <string>
@@ -169,13 +170,11 @@ void TokenizerTest4() {
 
   TestTokenizer(input, expected, 4);
 }
-int main(int argc, char *argv[]) {
 
-  // Tokenizer Tests
+void RunTokenizerTests(){
   TokenizerTest1();
   TokenizerTest2();
   TokenizerTest3();
   TokenizerTest4();
-
-  return EXIT_SUCCESS;
 }
+
