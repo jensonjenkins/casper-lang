@@ -11,7 +11,7 @@ public:
   Program();
 
   std::string TokenLiteral() const override;
-  std::vector<std::shared_ptr<Statement>> m_statements;
+  std::vector<std::unique_ptr<Statement>> m_statements;
 };
 
 class Identifier : public Expression {
@@ -28,14 +28,14 @@ public:
 class LetStatement : public Statement {
 public:
   LetStatement() = default;
-  LetStatement(const Token token, std::shared_ptr<Identifier> identifier_ptr,
+  LetStatement(const Token token, std::unique_ptr<Identifier> identifier_ptr,
                std::unique_ptr<Expression> value_ptr);
 
   void statementNode() override;
   std::string TokenLiteral() const override;
 
   Token m_token; // TokenType::_LET token
-  std::shared_ptr<Identifier> m_identifier_ptr;
+  std::unique_ptr<Identifier> m_identifier_ptr;
   std::unique_ptr<Expression> m_value_ptr;
 };
 

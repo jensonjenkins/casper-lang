@@ -27,9 +27,9 @@ ast::Program *Parser::parseProgram() {
   ast::Program *program = new ast::Program();
 
   while (m_cur_token.m_type != TokenType::_EOF) {
-    std::shared_ptr<ast::Statement> stmt = parseStatement();
+    std::unique_ptr<ast::Statement> stmt = parseStatement();
     if (stmt) {
-      program->m_statements.push_back(stmt);
+      program->m_statements.push_back(std::move(stmt));
     }
     nextToken();
   }
@@ -74,8 +74,8 @@ std::unique_ptr<ast::LetStatement> Parser::parseLetStatement() {
     return nullptr;
   }
 
-  std::shared_ptr<ast::Identifier> identifier_ptr =
-      std::make_shared<ast::Identifier>(m_cur_token, m_cur_token.m_value);
+  std::unique_ptr<ast::Identifier> identifier_ptr =
+      std::make_unique<ast::Identifier>(m_cur_token, m_cur_token.m_value);
 
   if (!expectPeek(TokenType::_ASSIGN)) {
     return nullptr;
@@ -88,8 +88,8 @@ std::unique_ptr<ast::LetStatement> Parser::parseLetStatement() {
   }
 
   // TODO: Temporarily, we set Expression value_ptr to nullptr.
-  return std::make_unique<ast::LetStatement>(let_token, identifier_ptr,
-                                             nullptr);
+  return std::make_unique<ast::LetStatement>(
+      let_token, std::move(identifier_ptr), nullptr);
 }
 
 std::unique_ptr<ast::ReturnStatement> Parser::parseReturnStatement() {
@@ -100,7 +100,7 @@ std::unique_ptr<ast::ReturnStatement> Parser::parseReturnStatement() {
   while (!curTokenIs(TokenType::_SEMICOLON)) {
     nextToken();
   }
-  
+
   // TODO: Temporarily, we set return_value to nullptr.
   return std::make_unique<ast::ReturnStatement>(ret_token, nullptr);
 }

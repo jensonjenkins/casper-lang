@@ -1,5 +1,6 @@
 #include "ast.h"
 #include "ast_base.h"
+#include <memory>
 
 namespace ast {
 
@@ -24,9 +25,9 @@ std::string Identifier::TokenLiteral() const { return m_token.m_value; }
 
 // LetStatement Implementations
 LetStatement::LetStatement(const Token token,
-                           std::shared_ptr<Identifier> identifier_ptr,
+                           std::unique_ptr<Identifier> identifier_ptr,
                            std::unique_ptr<Expression> value_ptr)
-    : m_token(token), m_identifier_ptr(identifier_ptr),
+    : m_token(token), m_identifier_ptr(std::move(identifier_ptr)),
       m_value_ptr(std::move(value_ptr)){};
 
 void LetStatement::statementNode() {};

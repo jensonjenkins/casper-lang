@@ -85,8 +85,8 @@ void TestLetStatements(std::string input,
 
   bool passed = true;
   for (int i = 0; i < expected.size(); i++) {
-    std::shared_ptr<ast::Statement> stmt = program->m_statements[i];
-    if (!validateLetStatement(stmt, expected[i], test_id)) {
+    if (!validateLetStatement(std::move(program->m_statements[i]), expected[i],
+                              test_id)) {
       passed = false;
     }
   }
@@ -137,8 +137,8 @@ void TestReturnStatements(std::string input,
 
   bool passed = true;
   for (int i = 0; i < expected.size(); i++) {
-    std::shared_ptr<ast::Statement> stmt = program->m_statements[i];
-    if (!validateReturnStatement(stmt, expected[i], test_id)) {
+    if (!validateReturnStatement(std::move(program->m_statements[i]),
+                                 expected[i], test_id)) {
       passed = false;
     }
   }
