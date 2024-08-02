@@ -69,5 +69,6 @@ parser_test.o: $(SRC)parser.h $(TESTS)parser_test.h $(TESTS)parser_test.cpp
 
 .PHONY: clean
 clean:
-	rm -f $(OBJS) $(PARSER_OBJS) $(TOKEN_OBJS) $(TARGET) $(TEST_OBJS) $(TEST_TARGET)
+	rm -f *.o
+	rm -f $(TARGET) $(TEST_TARGET)
 

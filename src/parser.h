@@ -26,7 +26,24 @@ private:
   void nextToken();
 
   std::unique_ptr<ast::Statement> parseStatement();
+
+  /**
+   * @brief Parse 'let' statements
+   *
+   * Parse statements of the form 'let <identifier> = <expression>;'
+   *
+   * @return std::unique_ptr of the parsed let statement AST node
+   */
   std::unique_ptr<ast::LetStatement> parseLetStatement();
+
+  /**
+   * @brief Parse 'return' statements
+   *
+   * Parse statements of the form 'return <expression>;'
+   *
+   * @return std::unique_ptr of the parsed return statement AST node
+   */
+  std::unique_ptr<ast::ReturnStatement> parseReturnStatement();
 
   bool curTokenIs(const TokenType &t_type);
   bool peekTokenIs(const TokenType &t_type);

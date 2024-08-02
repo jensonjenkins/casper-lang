@@ -29,14 +29,26 @@ class LetStatement : public Statement {
 public:
   LetStatement() = default;
   LetStatement(const Token token, std::shared_ptr<Identifier> identifier_ptr,
-               Expression *value_ptr);
+               std::unique_ptr<Expression> value_ptr);
 
   void statementNode() override;
   std::string TokenLiteral() const override;
 
   Token m_token; // TokenType::_LET token
   std::shared_ptr<Identifier> m_identifier_ptr;
-  Expression *m_value_ptr;
+  std::unique_ptr<Expression> m_value_ptr;
+};
+
+class ReturnStatement : public Statement {
+public:
+  ReturnStatement() = default;
+  ReturnStatement(const Token token, std::unique_ptr<Expression> value_ptr);
+
+  void statementNode() override;
+  std::string TokenLiteral() const override;
+
+  Token m_token; // TokenType::_RETURN token
+  std::unique_ptr<Expression> m_value_ptr;
 };
 
 } // namespace ast

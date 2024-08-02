@@ -1,5 +1,5 @@
-#include "../src/tokenizer.h"
 #include "tokenizer_test.h"
+#include "../src/tokenizer.h"
 #include <cstdlib>
 #include <iostream>
 #include <string>
@@ -29,9 +29,13 @@ void TestTokenizer(std::string input, const std::vector<Token> expected,
   }
 
   if (passed) {
-    std::cout << "tokenizer_test[" << tc << "] - passed." << std::endl;
+    std::cout << "ok\t" << "tokenizer_test[" << tc << "]" << std::endl;
   }
 }
+
+// ====================================================================================
+//                                       Testcases
+// ====================================================================================
 
 void TokenizerTest1() {
   std::string input = "=+(){};,";
@@ -139,42 +143,30 @@ void TokenizerTest4() {
   )";
 
   std::vector<Token> expected = {
-      Token(TokenType::_IF, "if"),
-      Token(TokenType::_LPAREN, "("),
-      Token(TokenType::_INT_LITERAL, "5"),
-      Token(TokenType::_LT, "<"),
-      Token(TokenType::_INT_LITERAL, "10"),
-      Token(TokenType::_RPAREN, ")"),
-      Token(TokenType::_LBRACE, "{"),
-      Token(TokenType::_RETURN, "return"),
-      Token(TokenType::_TRUE, "true"),
-      Token(TokenType::_SEMICOLON, ";"),
+      Token(TokenType::_IF, "if"),          Token(TokenType::_LPAREN, "("),
+      Token(TokenType::_INT_LITERAL, "5"),  Token(TokenType::_LT, "<"),
+      Token(TokenType::_INT_LITERAL, "10"), Token(TokenType::_RPAREN, ")"),
+      Token(TokenType::_LBRACE, "{"),       Token(TokenType::_RETURN, "return"),
+      Token(TokenType::_TRUE, "true"),      Token(TokenType::_SEMICOLON, ";"),
+      Token(TokenType::_RBRACE, "}"),       Token(TokenType::_ELSE, "else"),
+      Token(TokenType::_LBRACE, "{"),       Token(TokenType::_RETURN, "return"),
+      Token(TokenType::_FALSE, "false"),    Token(TokenType::_SEMICOLON, ";"),
       Token(TokenType::_RBRACE, "}"),
-      Token(TokenType::_ELSE, "else"),
-      Token(TokenType::_LBRACE, "{"),
-      Token(TokenType::_RETURN, "return"),
-      Token(TokenType::_FALSE, "false"),
-      Token(TokenType::_SEMICOLON, ";"),
-      Token(TokenType::_RBRACE, "}"),
-     
-      Token(TokenType::_INT_LITERAL, "10"),
-      Token(TokenType::_EQ, "=="),
-      Token(TokenType::_INT_LITERAL, "10"),
-      Token(TokenType::_SEMICOLON, ";"),
 
-      Token(TokenType::_INT_LITERAL, "10"),
-      Token(TokenType::_NEQ, "!="),
-      Token(TokenType::_INT_LITERAL, "9"),
-      Token(TokenType::_SEMICOLON, ";"),
+      Token(TokenType::_INT_LITERAL, "10"), Token(TokenType::_EQ, "=="),
+      Token(TokenType::_INT_LITERAL, "10"), Token(TokenType::_SEMICOLON, ";"),
+
+      Token(TokenType::_INT_LITERAL, "10"), Token(TokenType::_NEQ, "!="),
+      Token(TokenType::_INT_LITERAL, "9"),  Token(TokenType::_SEMICOLON, ";"),
   };
 
   TestTokenizer(input, expected, 4);
 }
 
-void RunTokenizerTests(){
+void RunTokenizerTests() {
   TokenizerTest1();
   TokenizerTest2();
   TokenizerTest3();
   TokenizerTest4();
+  std::cout << "passed\t(4/4)" << std::endl;
 }
-

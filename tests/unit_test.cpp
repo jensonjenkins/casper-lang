@@ -1,11 +1,17 @@
-#include "tokenizer_test.h"
 #include "parser_test.h"
+#include "tokenizer_test.h"
 #include <cstdlib>
+#include <iostream>
 
-int main(){
-    
-    RunTokenizerTests();
-    RunParserTests();
+int main() {
+  std::cout << "running casper unit tests:\n" << std::endl;
 
-    exit(EXIT_SUCCESS);
+  std::cout << "running RunTokenizerTests:" << std::endl;
+  RunTokenizerTests();
+  std::cout << std::endl;
+
+  std::cout << "running RunParserTests:" << std::endl;
+  RunParserTests();
+
+  exit(EXIT_SUCCESS);
 }

@@ -13,6 +13,15 @@ void Parser::nextToken() {
   m_peek_token = m_t.nextToken();
 }
 
+const std::vector<std::string> Parser::Errors() const { return this->errors; }
+
+void Parser::peekError(const TokenType &t_type) {
+  std::string error_msg = "Expected next token to be \"" +
+                          TokenTypeToString(t_type) + "\", got \"" +
+                          TokenTypeToString(m_peek_token.m_type) + "\"";
+  errors.push_back(error_msg);
+}
+
 ast::Program *Parser::parseProgram() {
   // TODO: Make sure to care for memory leaks, maybe use std::unique_ptr?
   ast::Program *program = new ast::Program();
@@ -32,6 +41,9 @@ std::unique_ptr<ast::Statement> Parser::parseStatement() {
   switch (m_cur_token.m_type) {
   case TokenType::_LET:
     return parseLetStatement();
+    break;
+  case TokenType::_RETURN:
+    return parseReturnStatement();
     break;
   default:
     return nullptr;
@@ -80,11 +92,15 @@ std::unique_ptr<ast::LetStatement> Parser::parseLetStatement() {
                                              nullptr);
 }
 
-const std::vector<std::string> Parser::Errors() const { return this->errors; }
+std::unique_ptr<ast::ReturnStatement> Parser::parseReturnStatement() {
+  Token ret_token = m_cur_token;
 
-void Parser::peekError(const TokenType &t_type) {
-  std::string error_msg = "Expected next token to be \"" +
-                          TokenTypeToString(t_type) + "\", got \"" +
-                          TokenTypeToString(m_peek_token.m_type) + "\"";
-  errors.push_back(error_msg);
+  // TODO: Temporarily, we skip expressions until we find a
+  // semicolon just to pass unit tests.
+  while (!curTokenIs(TokenType::_SEMICOLON)) {
+    nextToken();
+  }
+  
+  // TODO: Temporarily, we set return_value to nullptr.
+  return std::make_unique<ast::ReturnStatement>(ret_token, nullptr);
 }

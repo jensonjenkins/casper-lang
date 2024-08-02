@@ -1,9 +1,12 @@
 #include "ast.h"
+#include "ast_base.h"
 
-// ast::Program Implementations
-ast::Program::Program(){};
+namespace ast {
 
-std::string ast::Program::TokenLiteral() const {
+// Program Implementations
+Program::Program(){};
+
+std::string Program::TokenLiteral() const {
   if (m_statements.size() > 0) {
     return m_statements[0]->TokenLiteral();
   } else {
@@ -11,21 +14,32 @@ std::string ast::Program::TokenLiteral() const {
   }
 }
 
-// ast::Identifier Implementations
-ast::Identifier::Identifier(const Token token, const std::string value)
+// Identifier Implementations
+Identifier::Identifier(const Token token, const std::string value)
     : m_token(token), m_value(value){};
 
-void ast::Identifier::expressionNode() {};
+void Identifier::expressionNode() {};
 
-std::string ast::Identifier::TokenLiteral() const { return m_token.m_value; }
+std::string Identifier::TokenLiteral() const { return m_token.m_value; }
 
-// ast::LetStatement Implementations
-ast::LetStatement::LetStatement(const Token token,
-                                std::shared_ptr<ast::Identifier> identifier_ptr,
-                                Expression *value_ptr)
+// LetStatement Implementations
+LetStatement::LetStatement(const Token token,
+                           std::shared_ptr<Identifier> identifier_ptr,
+                           std::unique_ptr<Expression> value_ptr)
     : m_token(token), m_identifier_ptr(identifier_ptr),
-      m_value_ptr(value_ptr){};
+      m_value_ptr(std::move(value_ptr)){};
 
-void ast::LetStatement::statementNode() {};
+void LetStatement::statementNode() {};
 
-std::string ast::LetStatement::TokenLiteral() const { return m_token.m_value; }
+std::string LetStatement::TokenLiteral() const { return m_token.m_value; }
+
+// ReturnStatement Implementations
+ReturnStatement::ReturnStatement(const Token token,
+                                 std::unique_ptr<Expression> value_ptr)
+    : m_token(token), m_value_ptr(std::move(value_ptr)){};
+
+void ReturnStatement::statementNode() {};
+
+std::string ReturnStatement::TokenLiteral() const { return m_token.m_value; }
+
+} // namespace ast
