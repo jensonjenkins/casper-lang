@@ -12,6 +12,7 @@ class Node {
 public:
   virtual std::string TokenLiteral() const = 0;
   virtual ~Node() = default;
+  virtual std::string toString() const = 0;
 };
 
 class Statement : public Node {

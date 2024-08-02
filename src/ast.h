@@ -11,7 +11,8 @@ public:
   Program();
 
   std::string TokenLiteral() const override;
-  std::vector<std::unique_ptr<Statement>> m_statements;
+  std::string toString() const override;
+  std::vector<std::shared_ptr<Statement>> m_statements;
 };
 
 class Identifier : public Expression {
@@ -19,6 +20,7 @@ public:
   Identifier(const Token token, const std::string value);
 
   void expressionNode() override;
+  std::string toString() const override;
   std::string TokenLiteral() const override;
 
   Token m_token; // TokenType::_IDENTIFIER token
@@ -32,23 +34,37 @@ public:
                std::unique_ptr<Expression> value_ptr);
 
   void statementNode() override;
+  std::string toString() const override;
   std::string TokenLiteral() const override;
 
   Token m_token; // TokenType::_LET token
   std::unique_ptr<Identifier> m_identifier_ptr;
-  std::unique_ptr<Expression> m_value_ptr;
+  std::unique_ptr<Expression> m_expr_ptr;
 };
 
 class ReturnStatement : public Statement {
 public:
   ReturnStatement() = default;
-  ReturnStatement(const Token token, std::unique_ptr<Expression> value_ptr);
+  ReturnStatement(const Token token, std::unique_ptr<Expression> return_value_ptr);
 
   void statementNode() override;
+  std::string toString() const override;
   std::string TokenLiteral() const override;
 
   Token m_token; // TokenType::_RETURN token
-  std::unique_ptr<Expression> m_value_ptr;
+  std::unique_ptr<Expression> m_return_value_ptr;
+};
+
+class ExpressionStatement : public Statement {
+  ExpressionStatement() = default;
+  ExpressionStatement(const Token token, std::unique_ptr<Expression> expr_ptr);
+
+  void statementNode() override;
+  std::string toString() const override;
+  std::string TokenLiteral() const override;
+
+  Token m_token; // first token in the expression
+  std::unique_ptr<Expression> m_expr_ptr;
 };
 
 } // namespace ast
