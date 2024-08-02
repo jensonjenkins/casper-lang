@@ -5,16 +5,13 @@
 #include <string>
 
 struct Token {
-  Token() : m_type(TokenType::_ILLEGAL), m_value("ILLEGAL"){};
+  Token();
 
-  Token(TokenType token, const std::string &value)
-      : m_type(token), m_value(value){};
+  Token(TokenType token, const std::string &value);
 
-  Token(TokenType token) : m_type(token){};
+  Token(TokenType token);
 
-  bool operator==(const Token &other) const {
-    return m_type == other.m_type && m_value == other.m_value;
-  }
+  bool operator==(const Token &other) const;
 
   TokenType m_type;
 
@@ -22,4 +19,3 @@ struct Token {
 };
 
 #endif
-
