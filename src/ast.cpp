@@ -1,10 +1,7 @@
 #include "ast.h"
-#include <iostream>
 
 // ast::Program Implementations
-ast::Program::Program()
-    : m_statements(std::vector<std::shared_ptr<ast::Statement>>(0)) {
-};
+ast::Program::Program(){};
 
 std::string ast::Program::TokenLiteral() const {
   if (m_statements.size() > 0) {

@@ -1,6 +1,6 @@
 #include "parser.h"
 #include "ast.h"
-#include <iostream>
+#include "tokentype.h"
 #include <memory>
 
 Parser::Parser(Tokenizer &t) : m_t(t) {
@@ -38,19 +38,20 @@ std::unique_ptr<ast::Statement> Parser::parseStatement() {
   }
 }
 
-bool Parser::curTokenIs(const TokenType &type) {
-  return m_cur_token.m_type == type;
+bool Parser::curTokenIs(const TokenType &t_type) {
+  return m_cur_token.m_type == t_type;
 }
 
-bool Parser::peekTokenIs(const TokenType &type) {
-  return m_peek_token.m_type == type;
+bool Parser::peekTokenIs(const TokenType &t_type) {
+  return m_peek_token.m_type == t_type;
 }
 
-bool Parser::expectPeek(const TokenType &type) {
-  if (peekTokenIs(type)) {
+bool Parser::expectPeek(const TokenType &t_type) {
+  if (peekTokenIs(t_type)) {
     nextToken();
     return true;
   }
+  peekError(t_type);
   return false;
 }
 
@@ -77,4 +78,13 @@ std::unique_ptr<ast::LetStatement> Parser::parseLetStatement() {
   // TODO: Temporarily, we set Expression value_ptr to nullptr.
   return std::make_unique<ast::LetStatement>(let_token, identifier_ptr,
                                              nullptr);
+}
+
+const std::vector<std::string> Parser::Errors() const { return this->errors; }
+
+void Parser::peekError(const TokenType &t_type) {
+  std::string error_msg = "Expected next token to be \"" +
+                          TokenTypeToString(t_type) + "\", got \"" +
+                          TokenTypeToString(m_peek_token.m_type) + "\"";
+  errors.push_back(error_msg);
 }

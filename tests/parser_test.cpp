@@ -6,6 +6,21 @@
 #include <string>
 #include <vector>
 
+void checkParserErrors(const Parser &p) {
+  std::vector<std::string> errors = p.Errors();
+
+  if (errors.size() == 0) {
+    return;
+  }
+  std::cerr << "parser has " << errors.size() << " errors." << std::endl;
+
+  for (std::string error_msg : errors) {
+    std::cerr << "parser error: " << error_msg << std::endl;
+  }
+
+  exit(EXIT_FAILURE);
+}
+
 bool validateLetStatement(Tokenizer &t, std::shared_ptr<ast::Statement> s,
                           const std::string &expected_identifier,
                           const std::string &test_id) {
@@ -46,7 +61,10 @@ void TestLetStatements(std::string input,
   Tokenizer t(input);
   Parser p(t);
   ast::Program *program = p.parseProgram();
+  checkParserErrors(p);
+
   std::string test_id = "let_statement_test[" + std::to_string(tc) + "] - ";
+
   if (program == nullptr) {
     std::cerr << test_id << "Program::parseProgram() returned nullptr"
               << std::endl;
@@ -84,4 +102,18 @@ void LetStatementTest1() {
   TestLetStatements(input, expected_identifier, 1);
 }
 
-void RunParserTests() { LetStatementTest1(); }
+void LetStatementTest2() {
+  std::string input = R"(
+  let x 5;
+  let = 10;
+  let 838383;
+  )";
+
+  std::vector<std::string> expected_identifier = {"x", "y", "foobar"};
+  TestLetStatements(input, expected_identifier, 2);
+}
+
+void RunParserTests() {
+  LetStatementTest1();
+  // LetStatementTest2();
+}
