@@ -1,7 +1,7 @@
 #include "tokenizer_test.h"
 #include "../src/tokenizer.h"
+#include "../utils/msg_fmt.h"
 #include <cstdlib>
-#include <iostream>
 #include <string>
 #include <vector>
 
@@ -9,27 +9,28 @@ void TestTokenizer(std::string input, const std::vector<Token> expected,
                    int tc) {
   Tokenizer t(input);
   bool passed = true;
-
+  std::string test_id = "tokenizer_test[" + std::to_string(tc) + "]";
   for (Token expected_tok : expected) {
     Token tok = t.nextToken();
     if (tok.m_type != expected_tok.m_type) {
       passed = false;
-      std::cout << "tokenizer_test[" << tc << "] - tokentype wrong. ";
-      std::cout << "expected=\"" << expected_tok.m_type << "\", ";
-      std::cout << "got=\"" << tok.m_type << "\"" << std::endl;
+      msg::Fatal("tokentpe wrong. expected=\"" +
+                     TokenTypeToString(expected_tok.m_type) + "\", got=\"" +
+                     TokenTypeToString(tok.m_type) + "\"",
+                 test_id);
       exit(EXIT_FAILURE);
     }
     if (tok.m_value != expected_tok.m_value) {
       passed = false;
-      std::cout << "tokenizer_test[" << tc << "] - tokenvalue wrong. ";
-      std::cout << "expected=\"" << expected_tok.m_value << "\", ";
-      std::cout << "got=\"" << tok.m_value << "\"" << std::endl;
+      msg::Fatal("tokentpe wrong. expected=\"" + expected_tok.m_value +
+                     "\", got=\"" + tok.m_value + "\"",
+                 test_id);
       exit(EXIT_FAILURE);
     }
   }
 
   if (passed) {
-    std::cout << "ok\t" << "tokenizer_test[" << tc << "]" << std::endl;
+    msg::Ok(test_id);
   }
 }
 
@@ -168,5 +169,4 @@ void RunTokenizerTests() {
   TokenizerTest2();
   TokenizerTest3();
   TokenizerTest4();
-  std::cout << "passed\t(4/4)" << std::endl;
 }

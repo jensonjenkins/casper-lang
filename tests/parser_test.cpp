@@ -1,7 +1,7 @@
 #include "parser_test.h"
 #include "../src/parser.h"
+#include "../utils/msg_fmt.h"
 #include <cstdlib>
-#include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
@@ -12,11 +12,11 @@ void checkParserErrors(const Parser &p, const std::string &test_id) {
   if (errors.size() == 0) {
     return;
   }
-  std::cerr << "FAIL\t" << test_id << " - parser has " << errors.size()
-            << " errors." << std::endl;
+  msg::Error("parser has " + std::to_string(errors.size()) + " errors.",
+             test_id);
 
   for (std::string error_msg : errors) {
-    std::cerr << "parser error: " << error_msg << std::endl;
+    msg::Error("parser error: " + error_msg, test_id);
   }
 
   exit(EXIT_FAILURE);
@@ -26,9 +26,9 @@ bool validateLetStatement(std::shared_ptr<ast::Statement> s,
                           const std::string &expected,
                           const std::string &test_id) {
   if (s->TokenLiteral() != "let") {
-    std::cerr << "FAIL\t" << test_id
-              << " - TokenLiteral not 'let', instead got=\""
-              << s->TokenLiteral() << "\"" << std::endl;
+    msg::Fatal("TokenLiteral not 'let', instead got=\"" + s->TokenLiteral() +
+                   "\"",
+               test_id);
     return false;
   }
 
@@ -36,24 +36,23 @@ bool validateLetStatement(std::shared_ptr<ast::Statement> s,
       std::dynamic_pointer_cast<ast::LetStatement>(s);
 
   if (!let_stmt) {
-    std::cerr << "FAIL\t" << test_id << " - *s is not a ast::LetStatement"
-              << std::endl;
+    msg::Fatal("*s is not an ast::LetStatement", test_id);
     return false;
   }
 
   if (let_stmt->m_identifier_ptr->m_value != expected) {
-    std::cerr << "FAIL\t" << test_id << " - let_stmt identifier value is not "
-              << expected << ", instead got=\""
-              << let_stmt->m_identifier_ptr->m_value << "\"" << std::endl;
+    msg::Fatal("expected let_stmt identifier value \"" + expected +
+                   "\", instead got=\"" + let_stmt->m_identifier_ptr->m_value +
+                   "\"",
+               test_id);
     return false;
   }
 
   if (let_stmt->m_identifier_ptr->TokenLiteral() != expected) {
-    std::cerr << "FAIL\n"
-              << test_id << " - let_stmt identifier token literal is not "
-              << expected << ", instead got=\""
-              << let_stmt->m_identifier_ptr->TokenLiteral() << "\""
-              << std::endl;
+    msg::Fatal("expected let_stmt identifier TokenLiteral() \"" + expected +
+                   "\", instead got=\"" +
+                   let_stmt->m_identifier_ptr->TokenLiteral() + "\"",
+               test_id);
     return false;
   }
 
@@ -70,29 +69,28 @@ void TestLetStatements(std::string input,
   checkParserErrors(p, test_id);
 
   if (program == nullptr) {
-    std::cerr << "FAIL\t" << test_id
-              << " - Program::parseProgram() returned nullptr" << std::endl;
+    msg::Fatal("Program::parseProgram() returned nullptr", test_id);
     exit(EXIT_FAILURE);
   }
 
   if (program->m_statements.size() != expected.size()) {
-    std::cerr << "FAIL\t" << test_id
-              << " - Program::parseProgram() does not contain "
-              << expected.size() << " statements. got=\""
-              << program->m_statements.size() << "\"" << std::endl;
+    msg::Fatal("expected Program::parserProgram() to contain " +
+                   std::to_string(expected.size()) + " statements. got=\"" +
+                   std::to_string(program->m_statements.size()) + "\"",
+               test_id);
     exit(EXIT_FAILURE);
   }
 
   bool passed = true;
   for (int i = 0; i < expected.size(); i++) {
-    if (!validateLetStatement(std::move(program->m_statements[i]), expected[i],
-                              test_id)) {
+    std::shared_ptr<ast::Statement> stmt = program->m_statements[i];
+    if (!validateLetStatement(stmt, expected[i], test_id)) {
       passed = false;
     }
   }
 
   if (passed) {
-    std::cout << "ok\t" << test_id << std::endl;
+    msg::Ok(test_id);
   }
 }
 
@@ -100,9 +98,9 @@ bool validateReturnStatement(std::shared_ptr<ast::Statement> s,
                              const std::string &expected,
                              const std::string &test_id) {
   if (s->TokenLiteral() != "return") {
-    std::cerr << "FAIL\t" << test_id
-              << " - TokenLiteral not 'return', instead got=\""
-              << s->TokenLiteral() << "\"" << std::endl;
+    msg::Fatal("TokenLiteral not 'return', instead got=\"" + s->TokenLiteral() +
+                   "\"",
+               test_id);
     return false;
   }
 
@@ -110,8 +108,7 @@ bool validateReturnStatement(std::shared_ptr<ast::Statement> s,
       std::dynamic_pointer_cast<ast::ReturnStatement>(s);
 
   if (!ret_stmt) {
-    std::cerr << "FAIL\t" << test_id << " - *s is not a ast::RetunStatement"
-              << std::endl;
+    msg::Fatal("*s is not an ast::ReturnStatement", test_id);
     return false;
   }
 
@@ -129,22 +126,23 @@ void TestReturnStatements(std::string input,
   checkParserErrors(p, test_id);
 
   if (program->m_statements.size() != expected.size()) {
-    std::cerr << test_id << "Program::parseProgram() does not contain "
-              << expected.size() << " statements. got=\""
-              << program->m_statements.size() << "\"" << std::endl;
+    msg::Fatal("Program::parseProgram() does not contain " +
+                   std::to_string(expected.size()) + " statements. got=\"" +
+                   std::to_string(program->m_statements.size()) + "\"",
+               test_id);
     exit(EXIT_FAILURE);
   }
 
   bool passed = true;
   for (int i = 0; i < expected.size(); i++) {
-    if (!validateReturnStatement(std::move(program->m_statements[i]),
-                                 expected[i], test_id)) {
+    std::shared_ptr<ast::Statement> stmt = program->m_statements[i];
+    if (!validateReturnStatement(stmt, expected[i], test_id)) {
       passed = false;
     }
   }
 
   if (passed) {
-    std::cout << "ok\t" << test_id << std::endl;
+    msg::Ok(test_id);
   }
 }
 
@@ -189,5 +187,4 @@ void RunParserTests() {
   LetStatementTest1();
   // LetStatementTest2();
   ReturnStatementTest1();
-  std::cout << "passed\t(2/2)" << std::endl;
 }

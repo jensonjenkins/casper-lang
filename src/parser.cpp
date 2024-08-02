@@ -104,3 +104,11 @@ std::unique_ptr<ast::ReturnStatement> Parser::parseReturnStatement() {
   // TODO: Temporarily, we set return_value to nullptr.
   return std::make_unique<ast::ReturnStatement>(ret_token, nullptr);
 }
+
+void Parser::registerPrefix(const TokenType &t_type, prefixParseFn fn) {
+    prefixParseFns[t_type] = fn;
+};
+
+void Parser::registerInfix(const TokenType &t_type, infixParseFn fn) {
+    infixParseFns[t_type] = fn;
+};
