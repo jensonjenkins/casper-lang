@@ -78,7 +78,7 @@ std::string ReturnStatement::toString() const {
 
 // ExpressionStatement Implementations
 ExpressionStatement::ExpressionStatement(const Token token,
-                                         std::unique_ptr<Expression> expr_ptr)
+                                         std::shared_ptr<Expression> expr_ptr)
     : m_token(token), m_expr_ptr(std::move(expr_ptr)){};
 
 void ExpressionStatement::statementNode() {};

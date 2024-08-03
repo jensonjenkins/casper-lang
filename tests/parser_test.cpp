@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-void checkParserErrors(const Parser &p, const std::string &test_id) {
+void CheckParserErrors(const Parser &p, const std::string &test_id) {
   std::vector<std::string> errors = p.Errors();
 
   if (errors.size() == 0) {
@@ -22,7 +22,11 @@ void checkParserErrors(const Parser &p, const std::string &test_id) {
   exit(EXIT_FAILURE);
 }
 
-bool validateLetStatement(std::shared_ptr<ast::Statement> s,
+// ====================================================================================
+//                                     Let Statement
+// ====================================================================================
+
+bool ValidateLetStatement(std::shared_ptr<ast::Statement> s,
                           const std::string &expected,
                           const std::string &test_id) {
   if (s->TokenLiteral() != "let") {
@@ -59,14 +63,14 @@ bool validateLetStatement(std::shared_ptr<ast::Statement> s,
   return true;
 }
 
-void TestLetStatements(std::string input,
-                       const std::vector<std::string> expected, int tc) {
+void TestLetStatements(const std::string &input,
+                       const std::vector<std::string> &expected, int tc) {
   Tokenizer t(input);
   Parser p(t);
   ast::Program *program = p.parseProgram();
 
   std::string test_id = "let_statement_test[" + std::to_string(tc) + "]";
-  checkParserErrors(p, test_id);
+  CheckParserErrors(p, test_id);
 
   if (program == nullptr) {
     msg::Fatal("Program::parseProgram() returned nullptr", test_id);
@@ -84,7 +88,7 @@ void TestLetStatements(std::string input,
   bool passed = true;
   for (int i = 0; i < expected.size(); i++) {
     std::shared_ptr<ast::Statement> stmt = program->m_statements[i];
-    if (!validateLetStatement(stmt, expected[i], test_id)) {
+    if (!ValidateLetStatement(stmt, expected[i], test_id)) {
       passed = false;
     }
   }
@@ -94,7 +98,11 @@ void TestLetStatements(std::string input,
   }
 }
 
-bool validateReturnStatement(std::shared_ptr<ast::Statement> s,
+// ====================================================================================
+//                                    Return Statement
+// ====================================================================================
+
+bool ValidateReturnStatement(std::shared_ptr<ast::Statement> s,
                              const std::string &expected,
                              const std::string &test_id) {
   if (s->TokenLiteral() != "return") {
@@ -115,15 +123,15 @@ bool validateReturnStatement(std::shared_ptr<ast::Statement> s,
   return true;
 }
 
-void TestReturnStatements(std::string input,
-                          const std::vector<std::string> expected, int tc) {
+void TestReturnStatements(const std::string &input,
+                          const std::vector<std::string> &expected, int tc) {
   Tokenizer t(input);
   Parser p(t);
 
   ast::Program *program = p.parseProgram();
 
   std::string test_id = "return_statement_test[" + std::to_string(tc) + "] ";
-  checkParserErrors(p, test_id);
+  CheckParserErrors(p, test_id);
 
   if (program->m_statements.size() != expected.size()) {
     msg::Fatal("Program::parseProgram() does not contain " +
@@ -136,7 +144,78 @@ void TestReturnStatements(std::string input,
   bool passed = true;
   for (int i = 0; i < expected.size(); i++) {
     std::shared_ptr<ast::Statement> stmt = program->m_statements[i];
-    if (!validateReturnStatement(stmt, expected[i], test_id)) {
+    if (!ValidateReturnStatement(stmt, expected[i], test_id)) {
+      passed = false;
+    }
+  }
+
+  if (passed) {
+    msg::Ok(test_id);
+  }
+}
+
+// ====================================================================================
+//                                  Identifier Expression
+// ====================================================================================
+
+bool ValidateIdentifierExpression(std::shared_ptr<ast::Statement> s,
+                                   const std::string &expected,
+                                   const std::string &test_id) {
+  std::shared_ptr<ast::ExpressionStatement> expr_stmt =
+      std::dynamic_pointer_cast<ast::ExpressionStatement>(s);
+
+  if (!expr_stmt) {
+    msg::Fatal("statement is not an ast::ExpressionStatement.", test_id);
+    return false;
+  }
+  std::shared_ptr<ast::Identifier> identifier =
+      std::dynamic_pointer_cast<ast::Identifier>(expr_stmt->m_expr_ptr);
+
+  if (!identifier) {
+    msg::Fatal("expression of expression statement is not an ast::Identifier",
+               test_id);
+    return false;
+  }
+
+  if (identifier->m_value != expected) {
+    msg::Fatal("expected identifier value " + expected + ", instead got " +
+                   identifier->m_value,
+               test_id);
+    return false;
+  }
+
+  if (identifier->TokenLiteral() != expected) {
+    msg::Fatal("expected identifier TokenLiteral() " + expected +
+                   ", instead got " + identifier->TokenLiteral(),
+               test_id);
+    return false;
+  }
+
+  return true;
+}
+
+void TestIdentifierExpression(const std::string &input,
+                              const std::vector<std::string> &expected,
+                              int tc) {
+  Tokenizer t(input);
+  Parser p(t);
+
+  ast::Program *program = p.parseProgram();
+  std::string test_id = "identifer_expr_test[" + std::to_string(tc) + "] ";
+  CheckParserErrors(p, test_id);
+
+  if (program->m_statements.size() != expected.size()) {
+    msg::Fatal("program expected " + std::to_string(expected.size()) +
+                   " statements, instead got=" +
+                   std::to_string(program->m_statements.size()),
+               test_id);
+    exit(EXIT_FAILURE);
+  }
+
+  bool passed = true;
+  for (int i = 0; i < expected.size(); i++) {
+    std::shared_ptr<ast::Statement> stmt = program->m_statements[i];
+    if (!ValidateIdentifierExpression(stmt, expected[i], test_id)) {
       passed = false;
     }
   }
@@ -161,7 +240,7 @@ void LetStatementTest1() {
   TestLetStatements(input, expected, 1);
 }
 
-void LetStatementTest2() { // parsing error test case
+void LetStatementTest2() { // syntax error test case
   std::string input = R"(
   let x 5;
   let = 10;
@@ -183,8 +262,15 @@ void ReturnStatementTest1() {
   TestReturnStatements(input, expected, 1);
 }
 
+void IdentifierExpressionTest1() {
+  std::string input = "foobar;";
+  std::vector<std::string> expected = {"foobar"};
+
+  TestIdentifierExpression(input, expected, 1);
+}
+
 void RunParserTests() {
   LetStatementTest1();
-  // LetStatementTest2();
   ReturnStatementTest1();
+  IdentifierExpressionTest1();
 }

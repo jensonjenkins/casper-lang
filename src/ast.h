@@ -56,15 +56,16 @@ public:
 };
 
 class ExpressionStatement : public Statement {
+public:
   ExpressionStatement() = default;
-  ExpressionStatement(const Token token, std::unique_ptr<Expression> expr_ptr);
+  ExpressionStatement(const Token token, std::shared_ptr<Expression> expr_ptr);
 
   void statementNode() override;
   std::string toString() const override;
   std::string TokenLiteral() const override;
 
   Token m_token; // first token in the expression
-  std::unique_ptr<Expression> m_expr_ptr;
+  std::shared_ptr<Expression> m_expr_ptr;
 };
 
 } // namespace ast
