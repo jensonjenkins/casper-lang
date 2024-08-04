@@ -1,11 +1,15 @@
 #include "parser.h"
 #include "ast.h"
+#include "ast_base.h"
 #include "tokentype.h"
 #include <memory>
 
 Parser::Parser(Tokenizer &t) : m_t(t) {
   this->nextToken();
   this->nextToken();
+
+  registerPrefixFn(TokenType::_IDENTIFIER,
+                   std::bind(&Parser::parseIdentifier, this));
 };
 
 void Parser::nextToken() {
@@ -46,7 +50,7 @@ std::unique_ptr<ast::Statement> Parser::parseStatement() {
     return parseReturnStatement();
     break;
   default:
-    return nullptr;
+    return parseExpressionStatement();
   }
 }
 
@@ -105,10 +109,42 @@ std::unique_ptr<ast::ReturnStatement> Parser::parseReturnStatement() {
   return std::make_unique<ast::ReturnStatement>(ret_token, nullptr);
 }
 
-void Parser::registerPrefix(const TokenType &t_type, prefixParseFn fn) {
-    prefixParseFns[t_type] = fn;
+std::unique_ptr<ast::ExpressionStatement> Parser::parseExpressionStatement() {
+  Token cur_token = m_cur_token;
+  std::shared_ptr<ast::Expression> expr = parseExpression(Precedence::LOWEST);
+
+  std::unique_ptr<ast::ExpressionStatement> expr_stmt =
+      std::make_unique<ast::ExpressionStatement>(m_cur_token, expr);
+
+  if (peekTokenIs(TokenType::_SEMICOLON)) {
+    nextToken();
+  }
+  return expr_stmt;
+}
+
+std::shared_ptr<ast::Expression>
+Parser::parseExpression(Parser::Precedence precedence) {
+  std::map<TokenType, prefixParseFn>::iterator it =
+      prefixParseFns.find(m_cur_token.m_type);
+
+  if (it == prefixParseFns.end()) {
+    return nullptr;
+  }
+  std::shared_ptr<ast::Expression> left_expr = it->second();
+
+  return left_expr;
+}
+
+std::shared_ptr<ast::Expression> Parser::parseIdentifier() {
+  std::shared_ptr<ast::Identifier> ident =
+      std::make_shared<ast::Identifier>(m_cur_token, m_cur_token.m_value);
+  return ident;
+}
+
+void Parser::registerPrefixFn(const TokenType &t_type, prefixParseFn fn) {
+  prefixParseFns[t_type] = fn;
 };
 
-void Parser::registerInfix(const TokenType &t_type, infixParseFn fn) {
-    infixParseFns[t_type] = fn;
+void Parser::registerInfixFn(const TokenType &t_type, infixParseFn fn) {
+  infixParseFns[t_type] = fn;
 };

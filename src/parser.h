@@ -6,18 +6,37 @@
 #include "token.h"
 #include "tokenizer.h"
 #include "tokentype.h"
-
-typedef ast::Expression (*prefixParseFn)();
-typedef ast::Expression (*infixParseFn)(ast::Expression);
+#include <functional>
 
 class Parser {
 public:
+  /**
+   * @note std::function is used here to abstract away the underlying complexities
+   * we need to deal with when dealing with member functions.
+   */
+  using prefixParseFn = std::function<std::shared_ptr<ast::Expression>()>;
+  using infixParseFn = std::function<std::shared_ptr<ast::Expression>(ast::Expression)>;
+
   Parser(Tokenizer &t);
 
   ast::Program *parseProgram();
 
   const std::vector<std::string> Errors() const;
   void peekError(const TokenType &t_type);
+
+  /**
+   * @brief Enum showing order of parsing precedence for expressions
+   */
+  enum Precedence {
+    _,
+    LOWEST,
+    EQUALS,
+    LESSGREATER,
+    SUM,
+    PRODUCT,
+    PREFIX,
+    FCALL
+  };
 
 private:
   Tokenizer m_t;
@@ -67,8 +86,31 @@ private:
    */
   std::unique_ptr<ast::ReturnStatement> parseReturnStatement();
 
-  void registerPrefix(const TokenType &t_type, prefixParseFn fn);
-  void registerInfix(const TokenType &t_type, infixParseFn fn);
+  /**
+   * @brief Parse expression statements
+   * @return std::unique_ptr of the parsed expression statement AST node
+   */
+  std::unique_ptr<ast::ExpressionStatement> parseExpressionStatement();
+
+  /**
+   * @brief Parse general expressions
+   * @return std::unique_ptr of the parsed expression AST node
+   */
+  std::shared_ptr<ast::Expression>
+  parseExpression(Parser::Precedence precedence);
+
+  /**
+   * @brief Parse expressions starting with an identifier
+   * @return std::unique_ptr of the identifier AST node
+   *
+   * @note the only reason a static is used here is to conform to the
+   * prefixParseFn typedef, i.e. the typedef expects no parameters and a member
+   * function implicitly passes the class as an argument.
+   */
+  std::shared_ptr<ast::Expression> parseIdentifier();
+
+  void registerPrefixFn(const TokenType &t_type, prefixParseFn fn);
+  void registerInfixFn(const TokenType &t_type, infixParseFn fn);
 
   bool curTokenIs(const TokenType &t_type);
   bool peekTokenIs(const TokenType &t_type);
