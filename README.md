@@ -18,13 +18,6 @@ make tests
 ./csp_tests
 ```
 
-### To run tests:
-
-```sh
-make tests
-./csp_tests
-```
-
 ### To run main:
 
 ```sh
