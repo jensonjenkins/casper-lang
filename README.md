@@ -11,3 +11,23 @@ docker build -t casper .
 docker run -it casper sh
 ```
 
+### To run tests:
+
+```sh
+make tests
+./csp_tests
+```
+
+### To run tests:
+
+```sh
+make tests
+./csp_tests
+```
+
+### To run main:
+
+```sh
+make all
+./csp
+```
